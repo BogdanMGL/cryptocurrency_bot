@@ -38,8 +38,8 @@ const getСryptocurrency = async (chat_id, currencySymbol) => {
         }
         sendMessage(chat_id, result)
     } catch (err) {
-        const result = err
-        sendMessage(chat_id, result)
+        const text = `error, unknown command use command: /help`
+        sendMessage(chat_id, text)
     }
 }
 
