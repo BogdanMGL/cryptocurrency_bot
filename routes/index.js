@@ -54,7 +54,7 @@ const checkСryptocurrency = async (currency) => {
 
 const getPrice = async (currency) => {
     try {
-        const response = await axios.get(`${APIURL}quotes/latest`, { params: { 'symbol': currency } })         
+        const response = await axios.get(`${APIURL}quotes/latest`, { params: { 'symbol': currency } })
         return response.data.data
     } catch (err) {
         console.log(err)
@@ -151,19 +151,19 @@ const listFavoriteCurrency = async (chat_id, db) => {
     }
     let stringCurrency = ''
     arrayCurrency.forEach((item, i) => {
-        if(i === arrayCurrency.length - 1 ){
-        stringCurrency += item.name
-        }else{
-            stringCurrency+= item.name + ','
+        if (i === arrayCurrency.length - 1) {
+            stringCurrency += item.name
+        } else {
+            stringCurrency += item.name + ','
         }
-     })
+    })
     const data = await getPrice(stringCurrency)
     const arrayNameCurrency = stringCurrency.split(',')
-    let result='favorite currency list: \n'
-    arrayNameCurrency.forEach(item =>{
-        result +=  "/"+  data[`${item}`].symbol + "  $" + (data[`${item}`].quote.USD.price.toFixed(2)).toLocaleString('ru') + '\n'
+    let result = 'favorite currency list: \n'
+    arrayNameCurrency.forEach(item => {
+        result += "/" + data[`${item}`].symbol + "  $" + (data[`${item}`].quote.USD.price.toFixed(2)).toLocaleString('ru') + '\n'
     })
-    sendMessage(chat_id ,result )
+    sendMessage(chat_id, result)
 
 }
 

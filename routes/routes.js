@@ -1,5 +1,3 @@
-// import { getListCryptocurrencies, sendMessage, addCurrency, removeCurrency, listFavoriteCurrency, helpMessage, startMessage, checkMessage } from "./index.js"
-
 import * as API from "./index.js"
 
 
@@ -20,7 +18,7 @@ export function routes(app, db) {
         const messageText = req.body.message.text;
         const messageName = req.body.message.chat.first_name;
         const isBotCommand = "entities" in req.body.message
-         
+
         if (messageText.indexOf('addtofavorite') !== -1) {
             API.addCurrency(messageChatId, messageText, db)
             return res.status(200).send({});
