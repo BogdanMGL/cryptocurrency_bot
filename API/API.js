@@ -9,12 +9,10 @@ axios.defaults.headers.common['X-CMC_PRO_API_KEY'] = config.COIN_API_KEY;
 
 
 
-
-
 class TelegramAPI {
 
-    sendMessage(chatId, text, keyboard) {
-        axios.post(`${TG_URL}${TG_TOKEN}/sendMessage`, {
+    async sendMessage(chatId, text, keyboard) {
+        await axios.post(`${TG_URL}${TG_TOKEN}/sendMessage`, {
             chat_id: chatId, text, parse_mode: 'Markdown',
             reply_markup: keyboard
         })
@@ -24,7 +22,6 @@ class TelegramAPI {
 }
 
 class CoinmarketAPI {
-
 
     async getListCryptocurrencies() {
         const params = {
@@ -37,24 +34,20 @@ class CoinmarketAPI {
             .then((res) => result = res.data.data)
             .catch((err) => result = { error: true })
         return result
-
-
-
-
-
     }
+
 
     async checkСryptocurrency(currency) {
         let result
         await axios.get(`${COIN_URL}quotes/latest`, { params: { 'symbol': currency } })
             .then((res) => result = true)
             .catch((err) => {
-                if (err?.response?.status === 404) result = { erorr : true }
+                if (err?.response?.status === 404) result = { erorr: true }
                 else result = false
             })
         return result
-
     }
+
 
     async getСryptocurrency(currency) {
         let result
@@ -62,9 +55,7 @@ class CoinmarketAPI {
             .then((res) => result = res.data.data)
             .catch((err) => result = { error: true })
         return result
-
     }
-
 }
 
 const telegramAPI = new TelegramAPI()

@@ -2,28 +2,29 @@ import * as API from "./API/API.js"
 
 
 const startMessage = (chatId, messageName) => {
+
     const text =
         `Hello, ${messageName} , this bot will allow you to monitor the cryptocurrency market.`
     API.telegramAPI.sendMessage(chatId, text)
-
 }
 
 
 const helpMessage = (chatId) => {
+
     const text = `*To work with the bot, use the list of commands:* 
 /listrecent - list of cryptocurrencies, top 30 by market cap rating 
 /addtofavorite  - after the command, specify the name of the currency to add to favorites 
 /listfavorite - favorite currency list 
 /deletefavorite  - after the command, specify the name of the currency that you want to remove from favorites`
     API.telegramAPI.sendMessage(chatId, text)
-
 }
 
 
 
 const getListCryptocurrencies = async (chatId) => {
+
     const data = await API.coinmarketAPI.getListCryptocurrencies()
-    if(data?.error){
+    if (data?.error) {
         const text = "Error, coinmarketcap server not responding,please try again"
         API.telegramAPI.sendMessage(chatId, text)
         return
@@ -40,9 +41,11 @@ const getListCryptocurrencies = async (chatId) => {
 
 
 
-const getСryptocurrency = async (chatId, currencySymbol,db) => {
+const getСryptocurrency = async (chatId, currencySymbol, db) => {
+
     let data = await API.coinmarketAPI.getСryptocurrency(currencySymbol)
-    let result = '`' + "name: ".padEnd(27) + '`' + '_' + data[`${currencySymbol}`].name + '_' + '\n'
+    const name = data[`${currencySymbol}`].name
+    let result = '`' + "name: ".padEnd(27) + '`' + '_' + name + '_' + '\n'
     data = data[`${currencySymbol}`].quote.USD
     for (let key in data) {
         let name = (key.replace(/_(?=\d)/g, " in ").replace(/_/g, " ").replace(/h$/g, ' hours').replace(/d$/g, ' days') + ":").padEnd(27)
@@ -53,15 +56,15 @@ const getСryptocurrency = async (chatId, currencySymbol,db) => {
     }
     const currency = { chatId: chatId, name: currencySymbol }
     const findCurrency = await db.findOne(currency)
-    
-    
+
+
     let keyboardText = ''
     let callback_data = ''
     if (findCurrency) {
-        keyboardText = "Remove from favorite list"
+        keyboardText = `Remove ${name} from favorite list`
         callback_data = "/deletefavorite " + currencySymbol
     } else {
-        keyboardText = "Add to favorite list"
+        keyboardText = `Add  ${name} to favorite list`
         callback_data = "/addtofavorite " + currencySymbol
     }
     const keyboard = {
@@ -75,18 +78,19 @@ const getСryptocurrency = async (chatId, currencySymbol,db) => {
 
 
 const addCurrency = async (chatId, messageText, db) => {
+
     let text = ''
     const arrMessageText = messageText.replace(/\s+/g, " ").split(' ')
     if (arrMessageText.length !== 2) {
-        text = `Sorry, currency  is invalid. Please use this format: \n/addtofavorite currencySymbol \nExample: \n/addtofavorite BTC \n`
+        text = `Sorry, cryptocurrency  is invalid. Please use this format: \n/addtofavorite currencySymbol \nExample: \n/addtofavorite BTC \n`
         API.telegramAPI.sendMessage(chatId, text)
         return
     }
 
     const name = arrMessageText[1]
     const checkCurrency = await API.coinmarketAPI.checkСryptocurrency(name)
-    
-    if(checkCurrency?.error){
+
+    if (checkCurrency?.error) {
         text = 'Error, coinmarketcap server not responding,please try again'
         API.telegramAPI.sendMessage(chatId, text)
         return
@@ -100,11 +104,10 @@ const addCurrency = async (chatId, messageText, db) => {
     const currency = { name: name, chatId: chatId }
     const findCurrency = await db.findOne(currency)
     if (findCurrency !== null) {
-        text = 'Error, this cryptocurrency has already been added'
+        text = `Error, ${name},  cryptocurrency has already been added`
         API.telegramAPI.sendMessage(chatId, text)
         return
     }
-
 
     db.insertOne(currency, (err, result) => {
         if (err) text = 'Error, no cryptocurrency added, please try again'
@@ -112,7 +115,6 @@ const addCurrency = async (chatId, messageText, db) => {
         API.telegramAPI.sendMessage(chatId, text)
 
     });
-
 }
 
 
@@ -122,7 +124,7 @@ const removeCurrency = async (chatId, messageText, db) => {
 
     const arrMessageText = messageText.replace(/\s+/g, " ").split(' ')
     if (arrMessageText.length !== 2) {
-        const text = `Sorry, currency  is invalid. Please use this format: \n/deletefavorite currencySymbol \nExample: \n/deletefavorite BTC \n`
+        const text = `Sorry, cryptocurrency  is invalid. Please use this format: \n/deletefavorite currencySymbol \nExample: \n/deletefavorite BTC \n`
         API.telegramAPI.sendMessage(chatId, text)
         return
     }
@@ -130,7 +132,7 @@ const removeCurrency = async (chatId, messageText, db) => {
     const currency = { name: name, chatId: chatId }
     const findCurrency = await db.findOne(currency)
     if (!findCurrency) {
-        const text = `Error, this cryptocurrency is not on the list of favorites`
+        const text = `Error, ${name}, cryptocurrency is not on the list of favorites`
         API.telegramAPI.sendMessage(chatId, text)
         return
     }
@@ -141,7 +143,6 @@ const removeCurrency = async (chatId, messageText, db) => {
         else text = 'Cryptocurrency deleted successfully '
         API.telegramAPI.sendMessage(chatId, text)
     });
-
 }
 
 const listFavoriteCurrency = async (chatId, db) => {
@@ -158,7 +159,7 @@ const listFavoriteCurrency = async (chatId, db) => {
         else stringCurrency += item.name + ','
     })
     const data = await API.coinmarketAPI.getСryptocurrency(stringCurrency)
-    if(data?.error){
+    if (data?.error) {
         const text = "Error, coinmarketcap server not responding,please try again"
         API.telegramAPI.sendMessage(chatId, text)
         return
@@ -169,16 +170,15 @@ const listFavoriteCurrency = async (chatId, db) => {
         result += "/" + data[`${item}`].symbol + "  _" + data[`${item}`].quote.USD.price.toLocaleString('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 2 }) + '_' + '\n'
     })
     API.telegramAPI.sendMessage(chatId, result)
-
 }
 
 
-const checkMessage = async (chatId, messageText, isBotCommand,db) => {
+const checkMessage = async (chatId, messageText, isBotCommand, db) => {
 
     if (!isBotCommand) return
     const currency = messageText.slice(1).toUpperCase()
     const checkCurrency = await API.coinmarketAPI.checkСryptocurrency(currency)
-    if(checkCurrency?.error){
+    if (checkCurrency?.error) {
         text = 'Error, coinmarketcap server not responding,please try again'
         API.telegramAPI.sendMessage(chatId, text)
         return
@@ -188,9 +188,7 @@ const checkMessage = async (chatId, messageText, isBotCommand,db) => {
         API.telegramAPI.sendMessage(chatId, text)
         return
     }
-    getСryptocurrency(chatId, currency,db)
-
-
+    getСryptocurrency(chatId, currency, db)
 }
 
 export { getListCryptocurrencies, addCurrency, removeCurrency, listFavoriteCurrency, helpMessage, startMessage, checkMessage }

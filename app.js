@@ -1,4 +1,4 @@
-import express from "express"
+import express from 'express'
 import mongodb from 'mongodb'
 
 
@@ -15,7 +15,6 @@ app.use(express.json());
 
 
 const start = async () => {
-
     const client = new mongodb.MongoClient(DB_CONN, { useUnifiedTopology: true })
     await client.connect()
     const db = client.db(DB_NAME).collection(DB_COLLECTION)
@@ -23,7 +22,6 @@ const start = async () => {
     app.listen(PORT, () => {
         console.log(`app listening at http://localhost:${PORT}`);
     })
-
 }
 
 start()

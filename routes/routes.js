@@ -16,14 +16,11 @@ export function routes(app, db) {
             return res.status(200).send({});
         }
 
-        const messageChatId = req.body?.message?.chat?.id        ?? req.body.callback_query.message.chat.id
-        const messageText = req.body?.message?.text              ?? req.body.callback_query.data
+        const messageChatId = req.body?.message?.chat?.id ?? req.body.callback_query.message.chat.id
+        const messageText = req.body?.message?.text ?? req.body.callback_query.data
         const messageName = req.body?.message?.chat?.first_name;
         let isBotCommand
-        if(req.body?.message) isBotCommand = "entities" in req.body?.message
-        
-
-
+        if (req.body?.message) isBotCommand = "entities" in req.body?.message
 
 
         if (messageText.indexOf('addtofavorite') !== -1) {
@@ -34,7 +31,6 @@ export function routes(app, db) {
             bot.removeCurrency(messageChatId, messageText, db)
             return res.status(200).send({});
         }
-
 
         switch (messageText) {
             case '/help':
@@ -50,11 +46,8 @@ export function routes(app, db) {
                 bot.listFavoriteCurrency(messageChatId, db, messageText)
                 break
             default:
-                bot.checkMessage(messageChatId, messageText, isBotCommand,db)
+                bot.checkMessage(messageChatId, messageText, isBotCommand, db)
         }
         res.status(200).send({});
-
-
-
     })
 }
