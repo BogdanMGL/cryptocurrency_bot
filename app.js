@@ -1,26 +1,30 @@
 import express from "express"
-import dotenv from 'dotenv'
 import mongodb from 'mongodb'
 
 
+import config from './config/config.js'
 import { routes } from "./routes/routes.js"
 
 
-dotenv.config()
-const MongoClient = mongodb.MongoClient
-const DBConn = process.env.DBConn
+const DB_CONN = config.DB_CONN
+const DB_NAME = config.DB_NAME
+const DB_COLLECTION = config.DB_COLLECTION
+const PORT = config.PORT || 4000
 const app = express()
 app.use(express.json());
-const port = process.env.PORT || 4000
 
-MongoClient.connect(DBConn, { useUnifiedTopology: true }, (err, client) => {
-    if (err) {
-        return (console.log(err));
-    }
-    const db = client.db('CryptocurrencyBot')
+
+const start = async () => {
+
+    const client = new mongodb.MongoClient(DB_CONN, { useUnifiedTopology: true })
+    await client.connect()
+    const db = client.db(DB_NAME).collection(DB_COLLECTION)
     routes(app, db)
-    app.listen(port, () => {
-        console.log(`app listening at http://localhost:${port}`);
+    app.listen(PORT, () => {
+        console.log(`app listening at http://localhost:${PORT}`);
     })
+
 }
-)
+
+start()
+
