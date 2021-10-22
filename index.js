@@ -147,7 +147,7 @@ const removeCurrency = async (chatId, messageText, db) => {
 
 const listFavoriteCurrency = async (chatId, db) => {
 
-    const arrayCurrency = await db.find().toArray()
+    const arrayCurrency = await db.find({chatId:chatId}).toArray()
     if (!arrayCurrency.length) {
         const text = 'Favorites list is empty'
         API.telegramAPI.sendMessage(chatId, text)
