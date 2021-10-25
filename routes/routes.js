@@ -1,5 +1,4 @@
-import * as bot from '../index.js'
-import * as API from '../API/API.js'
+import * as bot from '../function/index.js'
 import config from '../config/config.js'
 
 
@@ -11,8 +10,7 @@ export function routes(app, db) {
     app.post(`/${TG_TOKEN}`, async (req, res) => {
         if ('edited_message' in req.body) {
             const messageChatId = req.body.edited_message.chat.id
-            const text = "Editing messages is not supported, create a new message"
-            API.telegramAPI.sendMessage(messageChatId, text)
+            bot.edited_message(messageChatId)
             return res.status(200).send({});
         }
 
